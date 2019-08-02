@@ -40,7 +40,6 @@ describe('Reviews Endpoints', function() {
       const newReview = {
         text: 'Test new review',
         thing_id: testThing.id,
-        user_id: testUser.id,
       }
       return supertest(app)
         .post('/api/reviews')
@@ -59,14 +58,14 @@ describe('Reviews Endpoints', function() {
         })
         .expect(res =>
           db
-            .from('blogful_reviews')
+            .from('thingful_reviews')
             .select('*')
             .where({ id: res.body.id })
             .first()
             .then(row => {
               expect(row.text).to.eql(newReview.text)
               expect(row.thing_id).to.eql(newReview.thing_id)
-              expect(row.user_id).to.eql(newReview.user_id)
+              expect(row.user_id).to.eql(testUser.id)
               const expectedDate = new Date().toLocaleString('en', { timeZone: 'UTC' })
               const actualDate = new Date(row.date_created).toLocaleString()
               expect(actualDate).to.eql(expectedDate)
@@ -74,14 +73,13 @@ describe('Reviews Endpoints', function() {
         )
     })
 
-    const requiredFields = ['text', 'user_id', 'thing_id']
+    const requiredFields = ['text', 'thing_id']
 
     requiredFields.forEach(field => {
       const testThing = testThings[0]
       const testUser = testUsers[0]
       const newReview = {
         text: 'Test new review',
-        user_id: testUser.id,
         thing_id: testThing.id,
       }
 
@@ -90,7 +88,7 @@ describe('Reviews Endpoints', function() {
 
         return supertest(app)
           .post('/api/reviews')
-          .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(newReview)
           .expect(400, {
             error: `Missing '${field}' in request body`,
