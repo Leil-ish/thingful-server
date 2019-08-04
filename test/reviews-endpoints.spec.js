@@ -39,6 +39,7 @@ describe('Reviews Endpoints', function() {
       const testUser = testUsers[0]
       const newReview = {
         text: 'Test new review',
+        rating: 3,
         thing_id: testThing.id,
       }
       return supertest(app)
@@ -48,6 +49,7 @@ describe('Reviews Endpoints', function() {
         .expect(201)
         .expect(res => {
           expect(res.body).to.have.property('id')
+          expect(res.body.rating).to.eql(newReview.rating)
           expect(res.body.text).to.eql(newReview.text)
           expect(res.body.thing_id).to.eql(newReview.thing_id)
           expect(res.body.user.id).to.eql(testUser.id)
@@ -64,6 +66,7 @@ describe('Reviews Endpoints', function() {
             .first()
             .then(row => {
               expect(row.text).to.eql(newReview.text)
+              expect(row.rating).to.eql(newReview.rating)
               expect(row.thing_id).to.eql(newReview.thing_id)
               expect(row.user_id).to.eql(testUser.id)
               const expectedDate = new Date().toLocaleString('en', { timeZone: 'UTC' })
@@ -73,13 +76,14 @@ describe('Reviews Endpoints', function() {
         )
     })
 
-    const requiredFields = ['text', 'thing_id']
+    const requiredFields = ['text', 'rating', 'thing_id']
 
     requiredFields.forEach(field => {
       const testThing = testThings[0]
       const testUser = testUsers[0]
       const newReview = {
         text: 'Test new review',
+        rating: 3,
         thing_id: testThing.id,
       }
 
